@@ -5,63 +5,157 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MapService · Ramani za Tanzania</title>
 <meta name="description" content="Maps of Tanzania for reports and projects: location, study area, topographic, land cover and catchment maps.">
+<meta name="theme-color" content="#F5F3EC">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='11' fill='%231D5B2E'/%3E%3Cg transform='translate(24 24) scale(.76) translate(-24 -24.5)'%3E%3Cpath d='M5 31.5V7h8.5L24 18.8 34.5 7H43v24.5h-8.5V19.7L24 31.5 13.5 19.7v11.8Z' fill='%23fff' stroke='%23fff' stroke-width='1.2' stroke-linejoin='round'/%3E%3Cpath d='M5 38.2h9.5V42H5ZM24 38.2h9.5V42H24Z' fill='%23fff'/%3E%3Cpath d='M5 38.2h38V42H5ZM5 35.4V42M24 35.4V42M43 35.4V42' fill='none' stroke='%23fff' stroke-width='1.2' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E">
 <style>
-  :root { --paper: #F5F3EC; --ink: #14211A; --ink-2: #3D4A42; --ink-3: #5A665E; --green: #1D5B2E; --green-800: #154521; --line: #D9D5C7; }
+  :root { --paper: #F5F3EC; --card: #FFFDF8; --ink: #14211A; --ink-2: #3D4A42; --ink-3: #5A665E; --green: #1D5B2E; --green-800: #154521;
+          --green-100: #E3EEE5; --terra: #A94A24; --sun: #E9A23B; --line: #D9D5C7; }
   * { box-sizing: border-box; }
   html, body { margin: 0; min-height: 100%; }
   body { background: var(--paper); color: var(--ink); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-         display: grid; place-items: center; min-height: 100vh; padding: 24px 16px; }
-  main { width: 100%; max-width: 460px; text-align: center; }
-  .logo { width: 56px; height: 56px; display: block; margin: 0 auto 14px; }
-  .name { font-weight: 700; letter-spacing: .01em; font-size: 18px; margin: 0 0 28px; }
-  .bar { width: 160px; height: 4px; margin: 0 auto; border-radius: 2px; background: var(--line); overflow: hidden; position: relative; }
-  .bar::after { content: ""; position: absolute; inset: 0; width: 40%; background: var(--green); border-radius: 2px; animation: go 1.1s ease-in-out infinite; }
+         min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 28px 16px; overflow-x: hidden; }
+  /* contour lines drifting slowly behind everything: a map that is still being drawn */
+  #topo { position: fixed; inset: -10%; width: 120%; height: 120%; z-index: 0; pointer-events: none; animation: drift 90s ease-in-out infinite alternate; }
+  #topo path { fill: none; stroke: var(--green); stroke-opacity: .09; stroke-width: 1.3; }
+  #topo path.idx { stroke-opacity: .16; stroke-width: 1.8; }
+  @keyframes drift { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(-3%, 2%) rotate(2deg); } }
+  main { position: relative; z-index: 1; width: 100%; max-width: 480px; text-align: center; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: .01em; margin-bottom: 22px; }
+  .brand svg { width: 40px; height: 40px; }
+  .brand small { display: block; font-weight: 500; font-size: 12px; color: var(--ink-3); letter-spacing: .06em; text-transform: uppercase; text-align: left; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 26px 22px 22px;
+          box-shadow: 0 1px 0 rgba(20,33,26,.04), 0 18px 40px -18px rgba(20,33,26,.22); }
+
+  .wait .bar { width: 170px; height: 4px; margin: 6px auto 0; border-radius: 2px; background: var(--line); overflow: hidden; position: relative; }
+  .wait .bar::after { content: ""; position: absolute; inset: 0; width: 40%; background: var(--green); border-radius: 2px; animation: go 1.1s ease-in-out infinite; }
   @keyframes go { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
-  @media (prefers-reduced-motion: reduce) { .bar::after { animation: none; width: 100%; } }
   .wait p { color: var(--ink-3); font-size: 14px; margin: 14px 0 0; }
+
   .away { display: none; }
-  .away.on { display: block; }
-  h1 { font-size: 24px; line-height: 1.25; margin: 0 0 6px; }
+  .away.on { display: block; animation: rise .6s ease-out both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .scene { width: 220px; height: 120px; display: block; margin: -4px auto 10px; overflow: hidden; }
+  .scene .rays { transform-origin: 110px 92px; animation: spin 40s linear infinite; }
+  .scene .sun { animation: glow 4s ease-in-out infinite alternate; }
+  .scene .pin { animation: bob 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center bottom; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes glow { from { opacity: .9; } to { opacity: 1; } }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  .kicker { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--terra);
+            background: #F7E8E0; border-radius: 999px; padding: 4px 12px; margin-bottom: 10px; }
+  h1 { font-size: 25px; line-height: 1.2; margin: 0 0 4px; letter-spacing: -.01em; text-wrap: balance; }
   .en { color: var(--ink-3); font-size: 15px; }
-  .lead { margin: 14px 0 4px; color: var(--ink-2); }
-  .actions { display: grid; gap: 10px; margin: 24px auto 0; max-width: 320px; }
-  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 10px;
+  h1 + .en { margin: 0 0 14px; font-weight: 600; }
+  .lead { margin: 0 0 4px; color: var(--ink-2); text-wrap: pretty; }
+  .lead .en { display: block; margin-top: 4px; font-size: 14px; }
+  .actions { display: grid; gap: 10px; margin: 20px auto 0; max-width: 340px; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 8px 18px; border-radius: 12px;
          font-family: inherit; font-size: 16px; font-weight: 600; line-height: 1.2; text-decoration: none; cursor: pointer; border: 1.5px solid var(--green); }
+  .btn small { display: block; font-weight: 500; font-size: 12.5px; opacity: .85; }
   .btn--main { background: var(--green); color: #fff; }
   .btn--main:hover { background: var(--green-800); }
   .btn--ghost { background: transparent; color: var(--green); }
   .btn:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
-  .small { font-size: 13px; color: var(--ink-3); margin-top: 22px; }
+  .btn svg { flex: none; }
+  .retry { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 16px; font-size: 13px; color: var(--ink-3); }
+  .ring { width: 22px; height: 22px; flex: none; transform: rotate(-90deg); }
+  .ring circle { fill: none; stroke-width: 3; }
+  .ring .bg { stroke: var(--line); }
+  .ring .fg { stroke: var(--green); stroke-linecap: round; stroke-dasharray: 56.5; transition: stroke-dashoffset 1s linear; }
+  .meanwhile { margin-top: 18px; text-align: left; }
+  .meanwhile h2 { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px; text-align: center; }
+  .types { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; list-style: none; padding: 0; margin: 0; }
+  .types li { background: rgba(255,253,248,.85); border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; font-size: 14px; font-weight: 600; line-height: 1.25;
+              display: flex; gap: 9px; align-items: center; animation: rise .5s ease-out both; }
+  .types li span { display: block; font-weight: 500; font-size: 12px; color: var(--ink-3); }
+  .types li i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .types li.student { grid-column: 1 / -1; background: var(--green-100); border-color: #C6DCCB; }
+  .note { font-size: 13px; color: var(--ink-3); margin: 18px 0 0; text-align: center; }
+  @media (max-width: 360px) { .types { grid-template-columns: 1fr; } h1 { font-size: 22px; } }
+  @media (prefers-reduced-motion: reduce) { *, *::after { animation: none !important; transition: none !important; } .wait .bar::after { width: 100%; } }
 </style>
 </head>
 <body>
+<svg id="topo" aria-hidden="true" preserveAspectRatio="xMidYMid slice"></svg>
 <main>
-  <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#1D5B2E"/><g transform="translate(24 24) scale(.76) translate(-24 -24.5)"><path d="M5 31.5V7h8.5L24 18.8 34.5 7H43v24.5h-8.5V19.7L24 31.5 13.5 19.7v11.8Z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/><path d="M5 38.2h9.5V42H5ZM24 38.2h9.5V42H24Z" fill="#fff"/><path d="M5 38.2h38V42H5ZM5 35.4V42M24 35.4V42M43 35.4V42" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="square"/></g></svg>
-  <p class="name">MapService</p>
+  <div class="brand"><svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#1D5B2E"/><g transform="translate(24 24) scale(.76) translate(-24 -24.5)"><path d="M5 31.5V7h8.5L24 18.8 34.5 7H43v24.5h-8.5V19.7L24 31.5 13.5 19.7v11.8Z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/><path d="M5 38.2h9.5V42H5ZM24 38.2h9.5V42H24Z" fill="#fff"/><path d="M5 38.2h38V42H5ZM5 35.4V42M24 35.4V42M43 35.4V42" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="square"/></g></svg>
+    <span>MapService<small>Ramani za Tanzania</small></span></div>
 
-  <div class="wait" id="wait" role="status">
+  <div class="card wait" id="wait" role="status">
     <div class="bar"></div>
     <p>Tunafungua MapService… · Opening MapService…</p>
   </div>
 
-  <div class="away" id="away" role="alert">
-    <h1>Samahani, hatupo hewani kwa sasa</h1>
-    <p class="en">Sorry, we're not online right now</p>
-    <p class="lead">Tovuti itarudi muda si mrefu. Unaweza kutuandikia WhatsApp, tutakujibu.<br>
-      <span class="en">The site will be back shortly. Message us on WhatsApp and we will reply.</span></p>
-    <div class="actions">
-      <a class="btn btn--main" href="https://wa.me/255759001714?text=Habari%20MapService%2C%20naomba%20ramani." target="_blank" rel="noopener">WhatsApp: +255 759 001 714</a>
-      <button class="btn btn--ghost" type="button" id="again">Jaribu tena · Try again</button>
+  <div class="away" id="away">
+    <div class="card" role="alert">
+      <svg class="scene" viewBox="0 0 220 120" aria-hidden="true">
+        <g class="rays" stroke="#E9A23B" stroke-width="3" stroke-linecap="round" opacity=".55">
+          <path d="M110 34v-14M110 150v14M52 92H38M168 92h14M69 51l-10-10M151 51l10-10M69 133l-10 10M151 133l10 10"/></g>
+        <circle class="sun" cx="110" cy="92" r="40" fill="#F2C46B"/>
+        <circle cx="110" cy="92" r="30" fill="#F6D58E"/>
+        <path d="M0 100 C 30 78 58 74 86 88 S 140 104 168 82 S 206 70 220 78 V120 H0Z" fill="#7FA987"/>
+        <path d="M0 108 C 40 92 70 96 104 106 S 170 116 220 98 V120 H0Z" fill="#3E7A4C"/>
+        <path d="M0 114 C 50 106 90 110 130 116 S 190 118 220 112 V120 H0Z" fill="#1D5B2E"/>
+        <path d="M18 104 C 48 90 74 92 98 100 M124 106 C 150 98 176 94 204 86" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.2"/>
+        <g class="pin"><path d="M150 60c-7 0-12.5 5.4-12.5 12.2 0 9.4 12.5 21.8 12.5 21.8s12.5-12.4 12.5-21.8C162.5 65.4 157 60 150 60Z" fill="#A94A24" stroke="#fff" stroke-width="2"/>
+          <circle cx="150" cy="72" r="4.4" fill="#fff"/></g>
+      </svg>
+      <span class="kicker">Tutarudi hivi punde · Back soon</span>
+      <h1>Tumepumzika kidogo, tutarudi hewani hivi punde</h1>
+      <p class="en">We're taking a short break and will be back online soon</p>
+      <p class="lead">Acha ukurasa huu wazi: tovuti ikirudi tu, utakupeleka huko wenyewe.
+        <span class="en">Keep this page open: the moment the site is back, it takes you there by itself.</span></p>
+      <div class="actions">
+        <a class="btn btn--main" id="wa" href="https://wa.me/255759001714?text=Habari%20MapService%2C%20naomba%20ramani.%20Mradi%20wangu%20uko%3A%20" target="_blank" rel="noopener">
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.2-.2-.5-.3Z"/></svg>
+          <span>Tuma mahali pa mradi wako<small>Send us your project location on WhatsApp</small></span></a>
+        <button class="btn btn--ghost" type="button" id="again">Jaribu sasa · Try now</button>
+      </div>
+      <div class="retry" aria-live="polite">
+        <svg class="ring" viewBox="0 0 22 22" aria-hidden="true"><circle class="bg" cx="11" cy="11" r="9"/><circle class="fg" id="ring" cx="11" cy="11" r="9"/></svg>
+        <span id="count">Tunajaribu tena wenyewe…</span>
+      </div>
+      <p class="note">Ukituma mahali sasa, tutaanza kazi mara tu tukirudi. · Send it now and we start the moment we're back.</p>
     </div>
-    <p class="small">Ukurasa huu utajaribu tena wenyewe kila dakika. · This page tries again by itself every minute.</p>
+
+    <section class="meanwhile">
+      <h2>Ramani tunazotengeneza · Maps we make</h2>
+      <ul class="types">
+        <li style="animation-delay:.05s"><i style="background:#1D5B2E"></i><div>Mahali mradi ulipo<span>Project location</span></div></li>
+        <li style="animation-delay:.1s"><i style="background:#3E7A4C"></i><div>Eneo la utafiti<span>Study area</span></div></li>
+        <li style="animation-delay:.15s"><i style="background:#9C7B4E"></i><div>Miinuko<span>Topographic</span></div></li>
+        <li style="animation-delay:.2s"><i style="background:#6E9F3A"></i><div>Matumizi ya ardhi<span>Land cover</span></div></li>
+        <li style="animation-delay:.25s"><i style="background:#2E6DB4"></i><div>Catchment<span>Streams and sub-basins</span></div></li>
+        <li style="animation-delay:.3s"><i style="background:#A94A24"></i><div>Mahali pa mafunzo (IT)<span>IT placement</span></div></li>
+        <li class="student" style="animation-delay:.35s"><i style="background:#1D5B2E"></i><div>Ofa ya wanafunzi kwa ramani za IT<span>Student offer on IT placement maps</span></div></li>
+      </ul>
+    </section>
   </div>
 </main>
 <script>
+  // contour lines for the background: a few hills, each ring a little wobbly, every fifth one stronger (index contours)
+  (function () {
+    var svg = document.getElementById("topo"), W = 1200, H = 900, out = "";
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    var hills = [[260, 230, 26, 1.0], [930, 640, 30, 1.25], [1010, 150, 14, .8], [180, 760, 16, .9]];
+    hills.forEach(function (h, k) {
+      for (var i = 1; i <= h[2]; i++) {
+        var r = i * 22 * h[3], d = "";
+        for (var a = 0; a <= 240; a++) {
+          var t = a / 240 * Math.PI * 2;
+          var rr = r * (1 + .12 * Math.sin(3 * t + k + i * .07) + .07 * Math.sin(5 * t - k * 2 + i * .05) + .025 * Math.sin(8 * t + i * .3));
+          d += (a ? "L" : "M") + (h[0] + rr * Math.cos(t)).toFixed(1) + " " + (h[1] + rr * .82 * Math.sin(t)).toFixed(1);
+        }
+        out += '<path' + (i % 5 === 0 ? ' class="idx"' : "") + ' d="' + d + 'Z"/>';
+      }
+    });
+    svg.innerHTML = out;
+  })();
+
   // The site runs on our own computer behind a tunnel whose address changes on every start. The start script writes the
   // current address to a GitHub gist; this page reads it, checks the site answers, and forwards the visitor there
-  // (same path, so shared order links keep working). If the computer is off: a gentle note, and a retry every minute.
-  var GIST = "a9eb15b7610d8724cb3e787efb301628", FILE = "mapservice_link.json";
+  // (same path, so shared order links keep working). If the computer is off: a hopeful note and a retry every 45 s.
+  var GIST = "a9eb15b7610d8724cb3e787efb301628", FILE = "mapservice_link.json", EVERY = 45;
   var SOURCES = [
     function () { return fetch("https://api.github.com/gists/" + GIST, {cache: "no-store"}).then(function (r) {
       if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (g) { return JSON.parse(g.files[FILE].content).url; }); },
@@ -84,26 +178,38 @@
       img.src = base + "/static/orders/brand/icon.svg?ping=" + Date.now();
     });
   }
-  function show(away) {
+  var away = false;
+  function show(isAway) {
+    if (isAway && !away) document.getElementById("away").classList.add("on");
+    away = away || isAway;
     document.getElementById("wait").style.display = away ? "none" : "";
-    document.getElementById("away").classList.toggle("on", away);
   }
-  var timer = null;
+  var timer = null, tick = null, left = 0;
+  var count = document.getElementById("count"), ring = document.getElementById("ring");
+  function countdown() {
+    clearInterval(tick); left = EVERY; paint();
+    tick = setInterval(function () { left--; paint(); if (left <= 0) { clearInterval(tick); go(); } }, 1000);
+  }
+  function paint() {
+    ring.style.strokeDashoffset = (56.5 * (1 - left / EVERY)).toFixed(1);
+    count.textContent = left > 0 ? "Tunajaribu tena baada ya sekunde " + left + " · Trying again in " + left + " s"
+                                 : "Tunaangalia sasa… · Checking now…";
+  }
   // on GitHub Pages the page lives under /<repository>/: that part is ours, not the site's path
   var HOME = /\.github\.io$/.test(location.hostname) ? "/" + location.pathname.split("/")[1] : "";
   function sitePath() { return location.pathname.slice(HOME.length) || "/"; }
   function go() {
-    show(false);
-    clearTimeout(timer);
+    clearInterval(tick); left = 0; if (away) paint(); else show(false);
     address().then(answers).then(function (base) {
       location.replace(base + sitePath() + location.search + location.hash);
     }).catch(function () {
       show(true);
-      timer = setTimeout(go, 60000);
+      countdown();
     });
   }
   document.getElementById("again").addEventListener("click", go);
-  go();
+  if (/[?&]preview=away\b/.test(location.search)) { show(true); countdown(); clearInterval(tick); paint(); left = EVERY; paint(); }
+  else go();
 </script>
 </body>
 </html>
