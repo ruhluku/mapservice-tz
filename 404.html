@@ -70,6 +70,8 @@
   .types li span { display: block; font-weight: 500; font-size: 12px; color: var(--ink-3); }
   .types li i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
   .types li.student { grid-column: 1 / -1; background: var(--green-100); border-color: #C6DCCB; }
+  .insha { unicode-bidi: isolate; white-space: nowrap; }
+  h1 .insha { font-size: .62em; font-weight: 500; color: var(--ink-3); vertical-align: .12em; }  /* said, not shouted */
   .note { font-size: 13px; color: var(--ink-3); margin: 18px 0 0; text-align: center; }
   @media (max-width: 360px) { .types { grid-template-columns: 1fr; } h1 { font-size: 22px; } }
   @media (prefers-reduced-motion: reduce) { *, *::after { animation: none !important; transition: none !important; } .wait .bar::after { width: 100%; } }
@@ -101,8 +103,8 @@
           <circle cx="150" cy="72" r="4.4" fill="#fff"/></g>
       </svg>
       <span class="kicker">Tutarudi hivi punde · Back soon</span>
-      <h1>Tumepumzika kidogo, tutarudi hewani hivi punde</h1>
-      <p class="en">We're taking a short break and will be back online soon</p>
+      <h1>Tumepumzika kidogo, tutarudi hewani hivi punde <span class="insha" lang="ar" dir="rtl">إن شاء الله</span></h1>
+      <p class="en">We're taking a short break and will be back online soon <span class="insha" lang="ar" dir="rtl">إن شاء الله</span></p>
       <p class="lead">Acha ukurasa huu wazi: tovuti ikirudi tu, utakupeleka huko wenyewe.
         <span class="en">Keep this page open: the moment the site is back, it takes you there by itself.</span></p>
       <div class="actions">
@@ -115,7 +117,7 @@
         <svg class="ring" viewBox="0 0 22 22" aria-hidden="true"><circle class="bg" cx="11" cy="11" r="9"/><circle class="fg" id="ring" cx="11" cy="11" r="9"/></svg>
         <span id="count">Tunajaribu tena wenyewe…</span>
       </div>
-      <p class="note">Ukituma mahali sasa, tutaanza kazi mara tu tukirudi. · Send it now and we start the moment we're back.</p>
+      <p class="note">Ukituma mahali sasa, tutaanza kazi mara tu tukirudi <span class="insha" lang="ar" dir="rtl">إن شاء الله</span> · Send it now and we start the moment we're back <span class="insha" lang="ar" dir="rtl">إن شاء الله</span></p>
     </div>
 
     <section class="meanwhile">
